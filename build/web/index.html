@@ -1,0 +1,1138 @@
+
+<html ng-app>
+    <head>
+        <title>coincomo_frontend</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" type="text/css" href="css/coincomo.css">
+    </head>
+    <body>
+<div id="container"  ng-controller="ComoCtrl">
+
+    <div id="header">
+        <h1>COINCOMO</h1>
+    </div>
+
+    <div id="context">
+        
+        <label ng-show="addSystemDisplay">Add System: </label>
+
+        <input ng-show="addSystemDisplay" type="text" ng-model="txtSys" size="30">
+        <input ng-show="addSystemDisplay" type="button" ng-click="addSystem()" value="OK">
+        <br>
+
+        <label ng-show="!addSystemDisplay" ng-click="showSystemOverview(system)">{{system.Name}}</label>
+        <input ng-show="!addSystemDisplay" type="button" ng-click="addSubSystem()" ng-model="btnSubSystem" value="(+)Sub-System">
+        <br>
+
+        <label ng-show="subSysStyle">Sub System Name: </label>
+        <input ng-show="subSysStyle" type="text" ng-model="txtSubSys" size="30" >
+        <input ng-show="subSysStyle" type="button" ng-model="btnAddSubSys" value="OK" ng-click="updateSubSystem(system)">
+        </br>
+
+        <div ng-repeat="subSystem in system.SubSystems">
+            <label ng-click="changeSubSystem(subSystem)" style="width:40px">&nbsp;&nbsp;&nbsp;&nbsp;{{subSystem.Name}}</label>
+            <input type="button" ng-click="addComponent(subSystem)" ng-model="btnComponent" value="(+)Component">
+            <br>
+
+            <div ng-show="subSystem.btnDisplay">
+            &nbsp;&nbsp;&nbsp;&nbsp;<label>Component Name: </label><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<input type="text" ng-model="txtCom" size="20" ><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" ng-model="btnAddComponent" value="OK" ng-click="updateComponent(subSystem,txtCom)"><br>
+            </div>
+
+            <div ng-repeat="component in subSystem.Components">
+                <label ng-click="showPanel('overview',component)" style="width:40px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{component.Name}}</label>
+            </div>
+        </div>
+        <br/>
+    </div>
+
+    <div id="overview">
+      <div ng-show="!system">
+           <span>There are currently no System!</span>
+      </div> 
+      <div class="componentDiv" ng-show="displayMode=='system'&& currentModel.overview&&system.SubSystems.length==0">
+            <span>System ({{system.Name}})'s Overview:</span>
+            <p>There are currently no Sub systems in ({{system.Name}})</p>
+      </div>
+      <div class="componentDiv" ng-show="displayMode=='system' && currentModel.overview && system.SubSystems.length!=0">
+          <span>System ({{system.Name}})'s Overview:</span>
+          <table class="Complextable">
+            <tr>
+                <td>
+                   Name 
+                </td>
+                <td>
+                   Size Sloc
+                </td>
+                <td>
+                    COST
+                </td>
+                <td>
+                    Staff
+                </td>
+                <td>
+                    Effort
+                </td>
+                <td>
+                    Schedule
+                </td>
+            </tr>
+            <tr ng-repeat='subsystem in system.SubSystems'>
+                <td>{{subsystem.Name}}</td> 
+                <td>{{subsystem.SLOC}}</td>
+                <td>$ {{subsystem.Cost}}</td>
+                <td>{{subsystem.Staff}}</td>
+                <td>{{subsystem.Effort}}</td>
+                <td>{{subsystem.Schedule}}</td>
+            </tr>
+            <tr>
+                <td>
+                   Total
+                </td>
+                <td>
+                   0
+                </td>
+                <td>
+                    $0.00
+                </td>
+                <td>
+
+                </td>
+                <td>
+                    0.00
+                </td>
+                <td>
+
+                </td> 
+            </tr>
+        </table>     
+      </div>
+      <div ng-show="displayMode == 'subSystem' && subsystem.overview && subsystem.Components.length==0" ng-repeat="subsystem in system.SubSystems">
+          <span>Sub system ({{subsystem.Name}})'s Overview:</span>
+         <p>There are currently no Components in ({{subsystem.Name}})</p>
+      </div>
+      <div ng-show="displayMode == 'subSystem' && subsystem.overview &&  subsystem.Components.length!=0" ng-repeat="subsystem in system.SubSystems">
+        <span>Sub system ({{subsystem.Name}})'s Overview:</span>
+        <table class="Complextable">
+             <tr>
+                 <td>
+                    Name 
+                 </td>
+                 <td>
+                    Size Sloc
+                 </td>
+                 <td>
+                     COST
+                 </td>
+                 <td>
+                     Staff
+                 </td>
+                 <td>
+                     Effort
+                 </td>
+                 <td>
+                     Schedule
+                 </td>
+             </tr>
+             <tr ng-repeat='component in subsystem.Components'>
+                 <td>{{component.Name}}</td> 
+                 <td>{{component.SLOC}}</td>
+                 <td>$ {{component.Cost}}</td>
+                 <td>{{component.Staff}}</td>
+                 <td>{{component.Effort}}</td>
+                 <td>{{component.Schedule}}</td>
+             </tr>
+             <tr>
+                 <td>
+                    Total
+                 </td>
+                 <td>
+                    0
+                 </td>
+                 <td>
+                     $0.00
+                 </td>
+                 <td>
+
+                 </td>
+                 <td>
+                     0.00
+                 </td>
+                 <td>
+
+                 </td>
+             </tr>
+         </table>
+       </div>
+       <div ng-show="displayMode = 'component'" ng-repeat="subsystem in system.SubSystems">
+         <div ng-show ="component.overview" ng-repeat="component in subsystem.Components">
+           <input type="button" value="COPSEMO" ng-click="showPanel('copsemo',component)">
+           <input type="button" value="({{component.Name}})'s PARAMETERS" ng-click="showPanel('parameters',component)"/><br>
+
+           <div class ="componentDiv">
+            <div>
+           <div id="blank"> 1</div><div id ="popUpBtn"><input type="button" value="Scale Factor 18.97" ng-click="scalFactor('open',component)">
+                    <input type="button" value="Schedule (SCED)" ng-click="schedulefunc('open',component)"></div></div>
+           <div class="popUp" ng-show="component.scaleDisplay">
+            <form novalidate class="simple-form">
+                <h3>Scale Factor-{{component.Name}}</h3>
+                <table class='simpleTable'>
+                    <tr>
+                        <td></td>
+                        <td>Rating</td>
+                        <td>Increment</td>   
+                    </tr>
+                    <tr>
+                        <td>Precedentedness(PREC)</td>
+                        <td><select ng-model="component.ScaleFactorsSettings.PREC.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="component.ScaleFactorsSettings.PREC.Increment" ng-options="i for i in increments"></select></td>
+                    </tr>
+                    <tr>
+                        <td>Development Flexibility(FLEX)</td>
+                        <td><select ng-model="component.ScaleFactorsSettings.FLEX.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="component.ScaleFactorsSettings.FLEX.Increment" ng-options="i for i in increments"></select></td>
+                    </tr>
+                    <tr>
+                        <td>Risk Resolution(RESL)</td>
+                        <td><select ng-model="component.ScaleFactorsSettings.RESL.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="component.ScaleFactorsSettings.RESL.Increment" ng-options="i for i in increments"></select></td>
+                    </tr>
+                    <tr>
+                        <td>Team Cohesion(TEAM)</td>
+                        <td><select ng-model="component.ScaleFactorsSettings.TEAM.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="component.ScaleFactorsSettings.TEAM.Increment" ng-options="i for i in increments"></select></td>
+                    </tr>
+                    <tr>
+                        <td>Process Maturity(PMAT)</td>
+                        <td><select ng-model="component.ScaleFactorsSettings.PMAT.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="component.ScaleFactorsSettings.PMAT.Increment" ng-options="i for i in increments"></select></td>
+                    </tr>
+                </table>
+                <input type="button" value="Apply" ng-click="Post()">
+                <input type="button" value="Reset" ng-click="empty('scale',component)">
+                <input type="button" value="Finish" ng-click="scalFactor('finish',component)">      
+            </form>
+           </div> 
+           <div class="popUp" ng-show="component.scheDisplay">
+            <form novalidate class="simple-form">
+                <h3>Schedule(SCED)-{{Component.Name}}</h3>
+
+                  <table class='simpleTable'>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>Rating</td>
+                        <td>Increment</td>   
+                    </tr>
+                    <tr>
+                        <td>Schedule(SCED)</td>
+                        <td id="specialTD">1.0</td>
+                        <td><select ng-model="component.ScheduleSettings.SCED.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="component.ScheduleSettings.SCED.Increment" ng-options="i for i in increments"></select></td>
+                    </tr>
+                    <tr>
+                        <td>Schedule%(SCED%)</td>
+                        <td class="specialTD">1.0</td>
+                        <td></td>
+                        <td></td>   
+                    </tr>
+                </table>
+                <input type="button" value="Apply" ng-click="Post()">
+                <input type="button" value="Reset"  ng-click="empty('schedule',component)">
+                <input type="button" value="Finish" ng-click="schedulefunc('finish',component)">      
+             </form>
+            </div>
+           <input type="button" value='Add Subcomponent' ng-click="addSubComponent()"/>
+           <input type="button" value='Delete Subcomponent(s)' ng-click="deleteSubComponent(component)"/>
+           <select ng-model="moreActions" ng-options="action.option for action in actions" ng-change="changeAction(moreActions,component)">
+           </select>
+           <label ng-show = subComponentDisplay ng-model="lblSubComponentName">Sub_Component Name: </label>
+            <input type="text" size="30" ng-model="txtSubCom" ng-show=subComStyle>
+            <input type="button" class="btnAddSubCom" ng-show=subComStyle value="OK" ng-click="updateSubComponent(component,txtSubCom)"/>
+         </div>
+         <div class="componentDiv">
+          <table class="Complextable">
+            <tr class="tableHeader">
+                <td> X </td>
+                <td> Name </td>
+                <td> Size </td>
+                <td> Labor Rate($/Month) </td>
+                <td> EAF </td>
+                <td> Language </td>
+                <td> NOM Effort DEV </td>
+                <td> EST Effort DEV </td>
+                <td> PROD </td>
+                <td> COST </td>
+                <td> INST COST </td>
+                <td> Staff </td>
+                <td> Risk </td>
+            </tr>
+            <tr ng-repeat="subComponent in component.SubComponents">
+                <td><input type="checkbox" ng-checked="subComponent.x" ng-model = "subComponent.x">
+                <td ng-click="editName(subComponent)">{{subComponent.Name}}</td>
+                <td ng-click="editSize(subComponent)">{{subComponent.SLOC}}</td>
+                <td ng-click="editLaborRate(subComponent)">{{subComponent.LaborRate}}</td>
+                <td ng-click="editEAF(subComponent)">1.00</td>
+                <td>{{subComponent.Language}}</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0.0</td>
+                <td>0.0</td>
+            </tr>
+         </table>    
+         </div>
+         <div>
+          <div ng-show="subComponent.nameDisplay" class="componentDiv" ng-repeat="subComponent in component.SubComponents">
+            <p> Please enter the new name:</p>
+            <input type="text" size="50" ng-model="subComponent.Name">
+            <input type="button" value="OK" ng-click="updateName(subComponent,'OK')">
+            <input type="button" value="Cancel" ng-click="updateName(subComponent,'Cancel')">
+          </div>
+          <div ng-show="subComponent.sizeDisplay" class="componentDiv" ng-repeat="subComponent in component.SubComponents">
+              <h>Breakage</h>
+              <p>% of code thrown away due to </p>
+              <p>requirements evolution and volitality</p>
+              <p>REVL:
+                   <input type="text" size="30">
+              </p>
+              <p>select a sizing type</p>
+
+              <input type="button" value="New" ng-click="subComponent.newDisplay = 1; subComponent.functionPointDisplay=0; subComponent.adaptationReuseDisplay=0">
+              <input type="button" value="Function Points" ng-click="subComponent.newDisplay = 0; subComponent.functionPointDisplay=1; subComponent.adaptationReuseDisplay=0">
+              <input type="button" value="Adaptation & Reuse" ng-click="subComponent.newDisplay = 0; subComponent.functionPointDisplay=0; subComponent.adaptationReuseDisplay=1">
+              <br>
+              <div ng-show="subComponent.newDisplay"  class="componentDiv" >
+                <p>SLOC:       <input type="text" ng-model = "subComponent.SLOC" size="30"></p>
+                <p>Languages:
+                    <select ng-model="subComponent.Language" ng-options="l for l in languages">
+                 </select>
+                </p>
+              </div>
+              <div ng-show="subComponent.functionPointDisplay">
+                    <p>Languages:  <select ng-model="subComponent.Language" ng-options="l for l in languages">
+                    </select>
+                        <input type="button" value="Change Multiplier">
+                        <input type="text" size="30">
+                    </p>
+                    <p></p>
+                    <p>Radio type            <input type="radio" name="ratio" value="Jones">
+                        <input type="radio" name="raion" value="David">
+                    </p>
+                    <p>Calculation method    <input type="radio" name="method" value="Using Table">
+                        <input type="radio" name="method" value="Input Calculated Function Points">
+                    </p>
+                    <p></p>
+                    <p>Function Type                                               Sub Total</p>
+                    <table class="copTable">
+                        <tr><td>Files:</td><td><input type="text" size="10"><input type="text" size="10"><input type="text" size="10"></td></tr>
+                        <tr><td>Interfaces:</td><td><input type="text" size="10"><input type="text" size="10"><input type="text" size="10"></td></tr>
+                        <tr><td>Inputs:</td><td><input type="text" size="10"><input type="text" size="10"><input type="text" size="10"></td></tr>
+                        <tr><td>Outputs:</td><td><input type="text" size="10"><input type="text" size="10"><input type="text" size="10"></td></tr>
+                        <tr><td>Queries:</td><td><input type="text" size="10"><input type="text" size="10"><input type="text" size="10"></td></tr>
+                    </table>
+                    <p>Total Unadjusted Function Points: <input type="text" size="20"></p>
+                    <p>Equivalent SLOC:                           0</p>
+                </div>
+                <div ng-show=subComponent.adaptationReuseDisplay class="componentDiv">
+                    <p>Languages:
+                        <select ng-model="subComponent.Language" ng-options="l for l in languages">
+
+                    </select></p>
+                    <p><button ng-click="addReuseModule(subComponent)">(+)Reused Module</button>
+                        <button ng-click="deleteReuseModel(subComponent)">(-)Reused Module</button>
+                    </p>
+                    <table ng-show=tableStyle class="Complextable">
+                        <tr class="tableHeader">
+                            <td> X </td>
+                            <td> Name </td>
+                            <td> Equivalent<br> SLOC </td>
+                            <td> Adapted <br> (initial) <br> SLOC </td>
+                            <td> Design <br> Modified </td>
+                            <td> Code <br> Modified </td>
+                            <td> Integration <br> Modified </td>
+                            <td> Software <br> Understanding </td>
+                            <td> Assessment <br> Assimilation </td>
+                            <td> Unfamiliarity </td>
+                            <td> Auto Translated </td>
+                            <td> AutoTranslation <br> Efficiency </td>
+                        </tr>
+                        <tr ng-repeat = "rm in subComponent.AdaptationAndReuse">
+                            <td><input type="checkbox" ng-checked="rm.x" ng-model = "rm.x"></td>
+                            <td ng-click="editRmName(rm)">{{rm.Name}}</td>
+                            <td ng-click="editRmParameter(rm)">{{rm.EquivalentSLOC}}</td>
+                            <td ng-click="editRmParameter(rm)">{{rm.AdaptedSLOC}}</td>
+                            <td ng-click="editRmParameter(rm)">{{rm.DesignModified}}</td>
+                            <td ng-click="editRmParameter(rm)">{{rm.CodeModified}}</td>
+                            <td ng-click="editRmParameter(rm)">{{rm.IntegrationModified}}</td>
+                            <td ng-click="editRmParameter(rm)">{{rm.SoftwareUnderstanding}}</td>
+                            <td ng-click="editRmParameter(rm)">{{rm.AssessmentAndAssimilation}}</td>
+                            <td ng-click="editRmParameter(rm)">{{rm.UnfamiliarityWithSoftware}}</td>
+                            <td ng-click="editRmParameter(rm)">{{rm.AutomaticallyTranslated}}</td>
+                            <td ng-click="editRmParameter(rm)">{{rm.AutomaticTranslationProductivity}}</td>
+                        </tr>
+                    </table>
+                    <div ng-show="rm.nameDisplay" class="componentDiv" ng-repeat="rm in subComponent.AdaptationAndReuse">
+                        <p> Please enter the new name:</p>
+                        <input type="text" size="50" ng-model="rm.Name">
+                        <input type="button" value="OK" ng-click="updateRmName(rm,'OK')">
+                        <input type="button" value="Cancel" ng-click="updateRmName(rm,'Cancel')">
+                    </div>
+
+                    <div ng-show="rm.parameterDisplay" class="componentDiv" ng-repeat = "rm in subComponent.AdaptationAndReuse">
+
+                        <p> Adaptation and Reuse - ({{rm.Name}})</p>
+                        <table>
+                            <tr>
+                                <td>Adapted (Initial) SLOC:</td>
+                                <td><input type="text" size="15" ng-model = rm.AdaptedSLOC></td>
+                            <tr>
+
+                            <tr>
+                                <td>%Design Modified (DM)</td>
+                                <td><input type="text" size="15" ng-model = rm.DesignModified>%</td>
+                            <tr>
+
+                            <tr>
+                                <td>%Code Modified (CM)</td>
+                                <td><input type="text" size="15" ng-model = rm.CodeModified></td>
+                            <tr>
+
+                            <tr>
+                                <td>%Integration Modified (IM)</td>
+                                <td><input type="text" size="15" ng-model = rm.IntegrationModified></td>
+                            <tr>
+
+                            <tr>
+                                <td>Software Understanding: </td>
+                                <td><input type="text" size="15" ng-model = rm.SoftwareUnderstanding></td>
+                            <tr>
+
+                            <tr>
+                                <td>Assessment & Assimilation: </td>
+                                <td><input type="text" size="15" ng-model = rm.AssessmentAndAssimilation></td>
+                            <tr>
+
+                            <tr>
+                                <td>Unfamiliarity With Software: </td>
+                                <td><input type="text" size="15" ng-model = rm.UnfamiliarityWithSoftware></td>
+                            <tr>
+
+                            <tr>
+                                <td>Components Automatically Translated: </td>
+                                <td><input type="text" size="15" ng-model = rm.AutomaticallyTranslated></td>
+                            <tr>
+
+                            <tr>
+                                <td>Automatic Translation Productivity Level: </td>
+                                <td><input type="text" size="15" ng-model = rm.AutomaticTranslationProductivity></td>
+                            <tr>
+
+                            <tr>
+                                <td>Computed Adaptation Adjustment Factor: </td>
+                                <td>{{rm.AdaptationAdjustmentFactor}}</td>
+                            <tr>
+
+                            <tr>
+                                <td>Equivalent SLOC: </td>
+                                <td>{{rm.EquivalentSLOC}}</td>
+                            <tr>
+                        </table>
+                        <input type="button" value="Apply" ng-click="updateRmParameter(rm)">
+                        <input type="button" value="Reset" ng-click="empty('rm',rm)">
+                        <input type="button" value="Close" ng-click="updateRmParameter(rm)">
+
+
+                    </div>
+
+
+                </div>
+                <input type="button" value="ok" ng-click="updateSize(subComponent,'OK')">
+                <input type="button" value="Cancel" ng-click="updateSize(subComponent,'Cancel')">
+            </div>
+
+            <div ng-show="subComponent.laborRateDisplay" ng-repeat="subComponent in component.SubComponents">
+                <p> Please enter the new labor rate: </p>
+                <input type="text" size="50" ng-model = "subComponent.LaborRate">
+
+                <input type="button" value="OK" ng-click="updateLaborRate(subComponent,'OK')">
+                <input type="button" value="Cancel" ng-click="updateLaborRate(subComponent,'Cancel')">
+            </div>
+            <div ng-show="subComponent.EAFDisplay" class="componentDiv" ng-repeat="subComponent in component.SubComponents">
+                <div class="componentDiv">
+                <p>Product</p>
+                <table class="simpleTable">
+                    <tr><td></td>
+                        <td>RELY</td>
+                        <td>DATA</td>
+                        <td>DOCU</td>
+                        <td>CPLX</td>
+                        <td>RUSE</td></tr>
+
+                    <tr>
+                        <td>Rating</td>
+                        <td><select ng-model="subComponent.EAFSettings.RELY.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.DATA.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.DOCU.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.CPLX.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.RUSE.Rating" ng-options="r for r in ratings"></select></td>
+                    </tr>
+                    <tr>
+                        <td>%incr</td>
+                        <td><select ng-model="subComponent.EAFSettings.RELY.Increment" ng-options="i for i in increments"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.DATA.Increment" ng-options="i for i in increments"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.DOCU.Increment" ng-options="i for i in increments"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.CPLX.Increment" ng-options="i for i in increments"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.RUSE.Increment" ng-options="i for i in increments"></select></td>
+                    </tr>
+                </table>
+                </div>
+             <div class="componentDiv">
+                <p>Platform</p>
+                <table class="simpleTable">
+                    <tr><td></td>
+                        <td>TIME</td>
+                        <td>STOR</td>
+                        <td>PVOL</td>
+                    </tr>
+
+                    <tr><td>Rating</td>
+                        <td><select ng-model="subComponent.EAFSettings.TIME.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.STOR.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.PVOL.Rating" ng-options="r for r in ratings"></select></td>
+
+                    </tr>
+                    <tr><td>%incr</td>
+                        <td><select ng-model="subComponent.EAFSettings.TIME.Increment" ng-options="i for i in increments"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.STOR.Increment" ng-options="i for i in increments"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.PVOL.Increment" ng-options="i for i in increments"></select></td>
+                    </tr>
+                </table>
+             </div>
+             <div class="componentDiv">
+              <p>Personnel</p>
+                <table class="simpleTable">
+                    <tr><td></td>
+                        <td>ACAP</td>
+                        <td>APEX</td>
+                        <td>PCAP</td>
+                        <td>PLEX</td>
+                        <td>LTEX</td>
+                        <td>PCON</td>
+                    </tr>
+                    <tr><td>Rating</td>
+                        <td><select ng-model="subComponent.EAFSettings.ACAP.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.APEX.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.PCAP.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.PLEX.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.LTEX.Rating" ng-options="r for r in ratings"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.PCON.Rating" ng-options="r for r in ratings"></select></td>
+                    </tr>
+                    <tr><td>%incr</td>
+                        <td><select ng-model="subComponent.EAFSettings.ACAP.Increment" ng-options="i for i in increments"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.APEX.Increment" ng-options="i for i in increments"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.PCAP.Increment" ng-options="i for i in increments"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.PLEX.Increment" ng-options="i for i in increments"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.LTEX.Increment" ng-options="i for i in increments"></select></td>
+                        <td><select ng-model="subComponent.EAFSettings.PCON.Increment" ng-options="i for i in increments"></select></td>
+                    </tr>
+                </table>
+                </div>
+
+                <div class="componentDiv">
+                    <table class="simpleTable">
+                        <tr><td>Project</td><td></td><td></td><td></td><td>User</td><td></td><td></td>
+                        <tr><td></td>
+                            <td>TOOL</td>
+                            <td>SITE</td>
+                            <td></td>
+                            <td></td>
+                            <td>USR1</td>
+                            <td>USR2</td>
+                        </tr>
+                        <tr><td>Rating</td>
+                            <td><select ng-model="subComponent.EAFSettings.TOOL.Rating" ng-options="r for r in ratings"></select></td>
+                            <td><select ng-model="subComponent.EAFSettings.SITE.Rating" ng-options="r for r in ratings"></select></td>
+                            <td></td>
+                            <td>Rating</td>
+                            <td><select ng-model="subComponent.EAFSettings.USR1.Rating" ng-options="r for r in ratings"></select></td>
+                            <td><select ng-model="subComponent.EAFSettings.USR2.Rating" ng-options="r for r in ratings"></select></td>
+                        </tr>
+                        <tr><td>%incr</td>
+                            <td><select ng-model="subComponent.EAFSettings.TOOL.Increment" ng-options="i for i in increments"></select></td>
+                            <td><select ng-model="subComponent.EAFSettings.SITE.Increment" ng-options="i for i in increments"></select></td>
+                            <td></td>
+                            <td>%incr</td>
+                            <td><select ng-model="subComponent.EAFSettings.USR1.Increment" ng-options="i for i in increments"></select></td>
+                            <td><select ng-model="subComponent.EAFSettings.USR2.Increment" ng-options="i for i in increments"></select></td>
+                        </tr>
+                    </table>
+                </div>
+                <br>
+                <br>
+                <input type="button" value="APPLY" ng-click="Post()">
+                <input type="button" value="Reset" ng-click="empty('subComponent_EAF',subComponent.EAFSettings)">
+                <input type="button" value="Close" ng-click="subComponent.EAFDisplay = 0">
+                <br>
+            </div>
+            </div>
+         <div class="componentDiv">  
+         <span>Estimation</span><br/>
+         <span>Total Lines Of Code: 0  Hours/PM: 152.0</span>
+         <table class='Complextable'>
+            <tr class="tableHeader">
+                <td>Estimate</td>
+                <td>Effort</td>
+                <td>Schedule</td>
+                <td>PROD</td>
+                <td>COST</td>
+                <td>INST</td>
+                <td>Staff</td>
+                <td>Risk</td>
+            </tr>
+            <tr>
+                <td class="tableHeader">Optimistic</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+            <tr/>
+            <tr>
+                <td class="tableHeader">Most Likely</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+            <tr/>
+            <tr>
+                <td class="tableHeader">Pessimistic</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+                <td>0.0</td>
+            <tr/>
+        </table>
+        </div>
+        </div>
+           
+               <div ng-show="component.copsemo_display" ng-repeat="component in subsystem.Components">
+          <input type="button" value="({{component.name}})'s OVERVIEW" ng-click="showPanel('overview',component)"/>
+          <input type="button" value="({{component.name}})'s PARAMETERS" ng-click="showPanel('parameters',component)"/><br>
+
+             <div class="componentDiv">      
+             <table class='copTable'>
+                <tr>
+                    <td></td>
+                    <td>Inception</td>
+                    <td>Elaboration</td>
+                    <td>Construction</td>  
+                    <td>Transition</td>
+                    <td>Total E&C</td> 
+                    <td>Total</td> 
+                </tr>
+                 <tr>
+                     <td>Effort%</td>
+                     <td><input type="number" ng-model="component.COPSEMO.Inception.EffortPercentage" min="2.0" max="15.0" required ng-click="showPanel('copsemo',component)"></td>
+                     <td><input type="number" ng-model="component.COPSEMO.Elaboration.EffortPercentage" min="20.0" max="80.0" required ng-click="showPanel('copsemo',component)"></td>
+                     <td><input type="number" ng-model="component.COPSEMO.Construction.EffortPercentage" min="20.0" max="80.0" required ng-click="showPanel('copsemo',component)"></td>
+                     <td><input type="number" ng-model="component.COPSEMO.Transition.EffortPercentage" min="0.0" max="20.0" required ng-click="showPanel('copsemo',component)" ></td>
+                     <td>{{component.COPSEMO.Elaboration.EffortPercentage+component.COPSEMO.Construction.EffortPercentage}}</td>
+                     <td>{{component.COPSEMO.Inception.EffortPercentage+component.COPSEMO.Elaboration.EffortPercentage+component.COPSEMO.Construction.EffortPercentage+component.COPSEMO.Transition.EffortPercentage}}</td>
+
+                 </tr>
+                 <tr>
+                     <td>Schedule%</td>
+                     <td><input type="number" ng-model="component.COPSEMO.Inception.SchedulePercentage" min="2.0" max="30.0" required ng-click="showPanel('copsemo',component)"></td>
+                     <td><input type="number" ng-model="component.COPSEMO.Elaboration.SchedulePercentage" min="33.0" max="67.0" required ng-click="showPanel('copsemo',component)"></td>
+                     <td><input type="number" ng-model="component.COPSEMO.Construction.SchedulePercentage" min="33.0" max="67.0" required ng-click="showPanel('copsemo',component)"></td>
+                     <td><input type="number" ng-model="component.COPSEMO.Transition.SchedulePercentage" min="0.0" max="20.0" required ng-click="showPanel('copsemo',component)"></td>
+                     <td>{{component.COPSEMO.Elaboration.SchedulePercentage+component.COPSEMO.Construction.SchedulePercentage}}</td>
+                     <td>{{component.COPSEMO.Inception.SchedulePercentage+component.COPSEMO.Elaboration.SchedulePercentage+component.COPSEMO.Construction.SchedulePercentage+component.COPSEMO.Transition.SchedulePercentage}}</td>
+                 </tr>
+                 <tr>
+                    <td>PM</td>
+                    <td>{{component.COPSEMO.Inception.Effort}}</td>
+                    <td>{{component.COPSEMO.Elaboration.Effort}}</td>
+                    <td>{{component.COPSEMO.Construction.Effort}}</td>  
+                    <td>{{component.COPSEMO.Transition.Effort}}</td>
+                    <td>{{component.COPSEMO.Elaboration.Effort+component.COPSEMO.Construction.Effort}}</td> 
+                    <td>{{component.COPSEMO.Inception.Effort+component.COPSEMO.Elaboration.Effort+component.COPSEMO.Construction.Effort+component.COPSEMO.Transition.Effort}}</td> 
+                 </tr>
+                 <tr>
+                    <td>M</td>
+                    <td>{{component.COPSEMO.Inception.Month}}</td>
+                    <td>{{component.COPSEMO.Elaboration.Month}}</td>
+                    <td>{{component.COPSEMO.Construction.Month}}</td>  
+                    <td>{{component.COPSEMO.Transition.Month}}</td>
+                    <td>{{component.COPSEMO.Elaboration.Month+component.COPSEMO.Construction.Month}}</td> 
+                    <td>{{component.COPSEMO.Inception.Month+component.COPSEMO.Elaboration.Month+component.COPSEMO.Construction.Month+component.COPSEMO.Transition.Month}}</td> 
+                 </tr>
+                 <tr>
+                     <td>P=PM/M</td>
+                    <td>{{component.COPSEMO.Inception.Personnel}}</td>
+                    <td>{{component.COPSEMO.Elaboration.Personnel}}</td>
+                    <td>{{component.COPSEMO.Construction.Personnel}}</td>  
+                    <td>{{component.COPSEMO.Transition.Personnel}}</td>
+                    <td>{{component.COPSEMO.Elaboration.Personnel+component.COPSEMO.Construction.Personnel}}</td> 
+                    <td>{{component.COPSEMO.Inception.Personnel+component.COPSEMO.Elaboration.Personnel+component.COPSEMO.Construction.Personnel+component.COPSEMO.Transition.Personnel}}</td> 
+                 </tr>
+             </table>
+           </div>
+         </div>
+         
+         <div ng-show="component.parameters_display" ng-repeat="component in subsystem.Components">
+         <input type="button" value="({{component.Name}})'s OVERVIEW" ng-click="showPanel('overview',component)"/>
+         <input type="button" value="({{component.Name}})'s COPSEMO" ng-click="showPanel('copsemo',component)"/><br>
+         <div class="componentDiv">
+         <input type ="button" value ="Effort Adjustment Factors" ng-click ="showParameters('para_effort',component,'open')"/>
+         <input type ="button" value ="Scale Factors" ng-click ="showParameters('para_scale',component,'open')"/>
+         <input type ="button" value ="Equation Editor" ng-click ="showParameters('para_equation',component,'open')"/>
+         <input type ="button" value ="Function Points " ng-click ="showParameters('para_function',component,'open')"/>
+         <input type ="button" value ="Person Month" ng-click ="showParameters('para_person',component,'open')"/>
+
+         <div class="componentDiv" ng-show="component.ParametersSettings.EffortAdjustmentFactors.para_EAF_display" >
+         <p>Effort Adjustment Factors - ({{ component.Name }})</p>
+         <input type ="button" value ="Product" ng-click ="showEAFParameters('product',component)"/>
+         <input type ="button" value ="Platform" ng-click ="showEAFParameters('platform',component)"/>
+         <input type ="button" value ="Personnel" ng-click ="showEAFParameters('personnel',component)"/>
+         <input type ="button" value ="Project" ng-click ="showEAFParameters('project',component)"/>
+         <input type ="button" value ="User Defined" ng-click ="showEAFParameters('user_defined',component)"/>
+         <br>
+         <div ng-model="EAF_product" class="componentDiv" ng-show="component.ParametersSettings.EffortAdjustmentFactors.para_EAF_product_display">
+             <table class='simpleTable'>
+                 <tr>
+                     <td></td>
+                     <td>VLO</td>
+                     <td>LO</td>
+                     <td>NOM</td>
+                     <td>HI</td>
+                     <td>VHI</td>
+                     <td>XHI</td>
+                 </tr>
+
+                 <tr>
+                     <td>RELY</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.RELY.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.RELY.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.RELY.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.RELY.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.RELY.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.RELY.XHI" ng-disabled = 1 ></td>
+                 </tr>
+
+                 <tr>
+                     <td>DATA</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.DATA.VLO" ng-disabled = 1 ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.DATA.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.DATA.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.DATA.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.DATA.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.DATA.XHI" ng-disabled = 1 ></td>
+                 </tr>
+
+                 <tr>
+                     <td>DOCU</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.DOCU.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.DOCU.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.DOCU.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.DOCU.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.DOCU.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.DOCU.XHI" ng-disabled = 1 ></td>
+                 </tr>
+
+                 <tr>
+                     <td>CPLX</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.CPLX.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.CPLX.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.CPLX.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.CPLX.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.CPLX.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.CPLX.XHI" ></td>
+                 </tr>
+
+                 <tr>
+                     <td>RUSE</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.RUSE.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.RUSE.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.RUSE.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.RUSE.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.RUSE.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.RUSE.XHI" ng-disabled = 1 ></td>
+                 </tr>
+             </table>
+             <input type='button' value ='Apply' ng-click="Post()"/>
+             <input type='button' value ='Reset' ng-click = "empty('parameter_EAF_product',component.ParametersSettings.EffortAdjustmentFactors)"/>
+             <input type='button' value ='Close' ng-click ="showParameters('para_effort',component,'close')"/>
+
+         </div>
+
+         <div ng-model="EAF_platform" class="componentDiv" ng-show="component.ParametersSettings.EffortAdjustmentFactors.para_EAF_platform_display">
+             <table class='simpleTable'>
+                 <tr>
+                     <td></td>
+                     <td>VLO</td>
+                     <td>LO</td>
+                     <td>NOM</td>
+                     <td>HI</td>
+                     <td>VHI</td>
+                     <td>XHI</td>
+                 </tr>
+
+                 <tr>
+                     <td>TIME</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.TIME.VLO" ng-disabled = 1 ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.TIME.LO" ng-disabled = 1 ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.TIME.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.TIME.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.TIME.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.TIME.XHI" ></td>
+                 </tr>
+
+                 <tr>
+                     <td>STOR</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.STOR.VLO" ng-disabled = 1 ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.STOR.LO" ng-disabled = 1 ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.STOR.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.STOR.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.STOR.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.STOR.XHI" ></td>
+                 </tr>
+
+                 <tr>
+                     <td>PVOL</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PVOL.VLO" ng-disabled = 1 ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PVOL.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PVOL.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PVOL.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PVOL.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PVOL.XHI" ng-disabled = 1 ></td>
+                 </tr>
+             </table>
+             <input type='button' value ='Apply' ng-click="Post()"/>
+             <input type='button' value ='Reset' ng-click ="empty('parameter_EAF_platform',component.ParametersSettings.EffortAdjustmentFactors)"/>
+             <input type='button' value ='Close' ng-click ="showParameters('para_effort',component,'close')"/>
+
+         </div>
+         <div ng-model="personnel_product" class="componentDiv" ng-show="component.ParametersSettings.EffortAdjustmentFactors.para_EAF_personnel_display">
+             <table class='simpleTable'>
+                 <tr>
+                     <td></td>
+                     <td>VLO</td>
+                     <td>LO</td>
+                     <td>NOM</td>
+                     <td>HI</td>
+                     <td>VHI</td>
+                     <td>XHI</td>
+                 </tr>
+
+                 <tr>
+                     <td>ACAP</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.ACAP.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.ACAP.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.ACAP.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.ACAP.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.ACAP.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.ACAP.XHI" ng-disabled = 1 ></td>
+                 </tr>
+
+                 <tr>
+                     <td>APEX</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.APEX.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.APEX.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.APEX.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.APEX.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.APEX.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.APEX.XHI" ng-disabled = 1 ></td>
+                 </tr>
+
+                 <tr>
+                     <td>PCAP</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PCAP.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PCAP.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PCAP.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PCAP.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PCAP.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PCAP.XHI" ng-disabled = 1 ></td>
+                 </tr>
+
+                 <tr>
+                     <td>PLEX</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PLEX.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PLEX.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PLEX.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PLEX.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PLEX.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PLEX.XHI" ng-disabled = 1 ></td>
+                 </tr>
+
+                 <tr>
+                     <td>LTEX</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.LTEX.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.LTEX.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.LTEX.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.LTEX.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.LTEX.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.LTEX.XHI" ng-disabled = 1 ></td>
+                 </tr>
+
+                 <tr>
+                     <td>PCON</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PCON.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PCON.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PCON.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PCON.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PCON.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.PCON.XHI" ng-disabled = 1 ></td>
+                 </tr>
+             </table>
+             <input type='button' value ='Apply' ng-click="Post()"/>
+             <input type='button' value ='Reset' ng-click ="empty('parameter_EAF_personnel',component.ParametersSettings.EffortAdjustmentFactors)"/>
+             <input type='button' value ='Close' ng-click ="showParameters('para_effort',component,'close')"/>
+
+
+         </div>
+         <div ng-model="EAF_project" class="componentDiv" ng-show="component.ParametersSettings.EffortAdjustmentFactors.para_EAF_project_display">
+             <table class='simpleTable'>
+                 <tr>
+                     <td></td>
+                     <td>VLO</td>
+                     <td>LO</td>
+                     <td>NOM</td>
+                     <td>HI</td>
+                     <td>VHI</td>
+                     <td>XHI</td>
+                 </tr>
+
+                 <tr>
+                     <td>TOOL</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.TOOL.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.TOOL.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.TOOL.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.TOOL.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.TOOL.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.TOOL.XHI" ng-disabled = 1 ></td>
+                 </tr>
+
+                 <tr>
+                     <td>SITE</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.SITE.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.SITE.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.SITE.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.SITE.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.SITE.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.SITE.XHI" ></td>
+                 </tr>
+
+                 <tr>
+                     <td>SCED</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.SCED.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.SCED.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.SCED.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.SCED.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.SCED.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.SCED.XHI" ng-disabled = 1 ></td>
+                 </tr>
+             </table>
+             <input type='button' value ='Apply' ng-click="Post()"/>
+             <input type='button' value ='Reset' ng-click ="empty('parameter_EAF_project',component.ParametersSettings.EffortAdjustmentFactors)"/>
+             <input type='button' value ='Close' ng-click ="showParameters('para_effort',component,'close')"/>
+
+         </div>
+         <div ng-model="EAF_user_defined" class="componentDiv" ng-show="component.ParametersSettings.EffortAdjustmentFactors.para_EAF_user_defined_display">
+             <table class='simpleTable'>
+                 <tr>
+                     <td></td>
+                     <td>VLO</td>
+                     <td>LO</td>
+                     <td>NOM</td>
+                     <td>HI</td>
+                     <td>VHI</td>
+                     <td>XHI</td>
+                 </tr>
+
+                 <tr>
+                     <td>USER1</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.USR1.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.USR1.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.USR1.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.USR1.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.USR1.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.USR1.XHI" ></td>
+                 </tr>
+
+                 <tr>
+                     <td>USER2</td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.USR2.VLO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.USR2.LO" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.USR2.NOM" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.USR2.HI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.USR2.VHI" ></td>
+                     <td><input type="text" ng-model="component.ParametersSettings.EffortAdjustmentFactors.USR2.XHI" ></td>
+                 </tr>
+             </table>
+             <input type='button' value ='Apply' ng-click="Post()"/>
+             <input type='button' value ='Reset' ng-click ="empty('parameter_EAF_user_defined',component.ParametersSettings.EffortAdjustmentFactors)"/>
+             <input type='button' value ='Close' ng-click ="showParameters('para_effort',component,'close')"/>
+
+         </div>
+         </div>
+         <div class="componentDiv" ng-show="component.ParametersSettings.ScaleFactors.para_scale_factor_display">
+             <p>Scale Factor - ({{ component.Name }})</p>
+             <table class ='simpleTable'>
+                 <tr>
+                     <td></td>
+                     <td>VLO</td>
+                     <td>LO</td>
+                     <td>NOM</td>
+                     <td>HI</td>
+                     <td>VHI</td>
+                     <td>XHI</td>
+                 </tr>
+                 <tr>
+                     <td>PREC</td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.PREC.VLO'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.PREC.LO'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.PREC.NOM'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.PREC.HI'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.PREC.VHI'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.PREC.XHI'/></td>
+
+                 </tr>
+                 <tr>
+                     <td>FLEX</td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.FLEX.VLO'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.FLEX.LO'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.FLEX.NOM'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.FLEX.HI'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.FLEX.VHI'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.FLEX.XHI'/></td>
+
+                 </tr>
+                 <tr>
+                     <td>RESL</td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.RESL.VLO'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.RESL.LO'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.RESL.NOM'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.RESL.HI'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.RESL.VHI'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.RESL.XHI'/></td>
+
+                 </tr>
+                 <tr>
+                     <td>TEAM</td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.TEAM.VLO'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.TEAM.LO'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.TEAM.NOM'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.TEAM.HI'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.TEAM.VHI'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.TEAM.XHI'/></td>
+
+                 </tr>
+                 <tr>
+                     <td>PMAT</td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.PMAT.VLO'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.PMAT.LO'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.PMAT.NOM'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.PMAT.HI'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.PMAT.VHI'/></td>
+                     <td><input type ='text' ng-model='component.ParametersSettings.ScaleFactors.PMAT.VHI'/></td>
+                 </tr>
+             </table>
+             <input type='button' value ='Apply' ng-click="Post()"/>
+             <input ng-click ="empty('parameter_scale_factor',component.ParametersSettings.ScaleFactors)"
+                    type='button' value ='Reset'/>
+             <input type='button' value ='Close' ng-click ="showParameters('para_scale',component,'close')"/>
+         </div>
+         <div class="componentDiv" ng-show="component.ParametersSettings.EquationEditor.para_equation_editor_display">
+             <p> Equation Editor - ({{ component.Name }})</p>
+             <h2>Effort Estimation Equation</h2>
+             <P>PM = <input type ='text' ng-model ='component.ParametersSettings.EquationEditor.EffortEstimationParameterA'/> * Size<sup>E</sup> * &prod; (EM<sub>1</sub>,...EM<sub>17</sub>) + PM<sub>auto</sub><br/>
+                 E = <input type ='text' ng-model ='component.ParametersSettings.EquationEditor.ExponentParameterB'> * 0.01 * &sum; (SF<sub>1</sub>,...,SF<sub>5</sub>)<br/>
+                 PM<sub>auto</sub> = Adapted SLOC * (AT / 100) / ATPROD
+             </P>
+             <h2>Schedule Estimation Equation</h2>
+             <P>TDEV =[<input type ='text' ng-model ='component.ParametersSettings.EquationEditor.ScheduleEstimationParameterC'/> * (PM<sub>NS</sub>)<sup>F</sup>] * SCED % / 100 <br>
+                 F = <input type ='text' ng-model ='component.ParametersSettings.EquationEditor.ScheduleEstimationParameterD'/> / 0.2 * [E-B]
+             </P>
+
+             <input type='button' value ='Apply' ng-click="Post()"/>
+             <input type='button' value ='Reset' ng-click ="empty('parameter_equation_editor',component.ParametersSettings.EquationEditor)"/>
+             <input type='button' value ='Close' ng-click ="showParameters('para_equation',component,'close')"/>
+
+         </div>
+         <div class="componentDiv" ng-show="component.ParametersSettings.FunctionPoints.para_function_points_display">
+             <p> Function Points - ({{ component.Name }})</p>
+             <table>
+                 <tr>
+                     <td></td>
+                     <td>LOW</td>
+                     <td>AVERAGE</td>
+                     <td>HIGH</td>
+                 </tr>
+                 <tr>
+                     <td>Internal Logical File(Files)</td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.InternalLogicalFiles.Low'/></td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.InternalLogicalFiles.Average'/></td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.InternalLogicalFiles.High'/></td>
+                 </tr>
+                 <tr>
+                     <td>External Interface File(Interfaces)</td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.ExternalInterfaceFiles.Low'/></td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.ExternalInterfaceFiles.Average'/></td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.ExternalInterfaceFiles.High'/></td>
+                 </tr>
+                 <tr>
+                     <td>External Inputs(Inputs)</td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.ExternalInputs.Low'/></td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.ExternalInputs.Average'/></td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.ExternalInputs.High'/></td>
+                 </tr>
+                 <tr>
+                     <td>External Outputs(Outputs)</td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.ExternalOutputs.Low'/></td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.ExternalOutputs.Average'/></td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.ExternalOutputs.High'/></td>
+                 </tr>
+                 <tr>
+                     <td>External Inquiries(Inquires)</td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.ExternalInquiries.Low'/></td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.ExternalInquiries.Average'/></td>
+                     <td><input type ='text' ng-model ='component.ParametersSettings.FunctionPoints.ExternalInquiries.High'/></td>
+                 </tr>
+             </table>
+             <input type='button' value ='Apply' ng-click="Post()"/>
+             <input type='button' value ='Reset'ng-click ="empty('parameter_function_points',component.ParametersSettings.FunctionPoints)"/>
+             <input type='button' value ='Close' ng-click ="showParameters('para_function',component,'close')"/>
+
+         </div>
+         <div class="componentDiv" ng-show="component.ParametersSettings.PersonMonth.para_person_month_display">
+             <p> Person Month - ({{ component.Name }})</p>
+             <p>Please Enter Hours/Person Month:</p>
+             <input type ='text' ng-model ='component.ParametersSettings.PersonMonth.HoursPerPM'/>
+             <input type='button' value ='Apply' ng-click="Post()"/>
+             <input type='button' value ='Close' ng-click ="showParameters('para_person',component,'close')"/>
+         </div>
+         </div>
+         </div>
+       </div>
+
+    </div>
+</div>   
+    </body>
+    <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="js/angular.js"></script>
+    <script type="text/javascript" src="js/coincomo_controller.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
+</html>

@@ -1,0 +1,108 @@
+#container
+ {
+     width:100%;
+ }
+
+#header
+{
+    background-color:#FFA500;
+    text-align: center;
+}
+
+h1
+{
+    margin-bottom: 0px;
+}
+
+#context
+{
+    background-color:#FFD700;
+    width:20%;
+    height:100%;
+    float:left;
+}
+
+#overview
+{
+    background-color:#EEEEEE;
+    width:80%;
+    float:left;
+    height:100%;
+}
+
+span
+{
+ font-weight: bold; 
+}
+
+.componentDiv
+{
+    border:1px solid #9999FF;
+     padding:10px;
+}
+
+.popUp
+{
+    
+}
+
+#blank
+{
+    color:#EEEEEE;
+    width:70%;  
+    float:left;
+}
+
+#popUpBtn
+{  
+   width:30%;
+   float:left;
+}
+
+#tableContainer
+{
+     border:1px solid #9999FF;
+     padding:20px;
+     height: 500px;
+}
+
+.Complextable
+{
+    width:100%;
+    border: 1px solid black;
+}
+
+.Complextable td
+{
+    border:1px solid black;
+    text-align:center;
+}
+
+.tableHeader
+{
+    background-color:#9999FF;
+}
+
+.simpleTable td
+{
+
+    text-align:left;
+    border-color: #ffffff;
+}
+.copTable
+{
+width:100%; 
+padding:20px;
+}
+
+.copTable td
+{
+    text-align:left;
+    border-color: #ffffff;
+    font-weight: bold;
+}
+
+.specialTD{
+    border: 1px solid blue;
+}
+
